@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 
 find_package(PkgConfig)
+#set(PKG_CONFIG_PATH "/usr/local/lib/pkgconfig")
+set( ENV{PKG_CONFIG_PATH} "/usr/local/lib/pkgconfig")
 pkg_search_module(CHILITAGS REQUIRED chilitags)
 
 ###################################
@@ -48,7 +50,7 @@ option (WITH_KNOWLEDGE "Add support for exporting to a KB-API knowledge base" OF
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${CHILITAGS_INCLUDE_DIRS})
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++0x)
 
 set(LIBS 
     ${catkin_LIBRARIES}
