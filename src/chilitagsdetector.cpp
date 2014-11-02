@@ -9,7 +9,7 @@ using namespace cv;
 #define TRANSFORM_FUTURE_DATING 0
 
 ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
-                                     const string& camera_frame, 
+                                     const string& camera_frame1, 
                                      const string& configFilename,
                                      bool omitOtherTags,
                                      double tagSize,
@@ -17,7 +17,7 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
                                      int persistence) :
             rosNode(rosNode),
             it(rosNode),
-            camera_frame(camera_frame),
+            camera_frame(camera_frame1),
             firstUncalibratedImage(true),
 #ifdef WITH_KNOWLEDGE
             connector("localhost", "6969"),
@@ -62,10 +62,14 @@ void ChilitagsDetector::setROSTransform(Matx44d trans, tf::Transform& transform)
                                     -1 * trans(1,3) / 1000) );
 
     tf::Quaternion qrot;
-    tf::Matrix3x3 mrot(
-        trans(0,0), trans(0,1), trans(0,2),
-        trans(1,0), trans(1,1), trans(1,2),
-        trans(2,0), trans(2,1), trans(2,2));
+//    tf::Matrix3x3 mrot(
+//        trans(0,0), trans(0,1), trans(0,2),
+//        trans(1,0), trans(1,1), trans(1,2),
+//        trans(2,0), trans(2,1), trans(2,2));
+        tf::Matrix3x3 mrot(
+        trans(2,0), trans(2,1), trans(2,2),
+        trans(1,0), trans(1,1), trans(1,0),
+        trans(0,0), trans(0,1), trans(0,0));
     mrot.getRotation(qrot);
     transform.setRotation(qrot);
 }
@@ -73,6 +77,7 @@ void ChilitagsDetector::setROSTransform(Matx44d trans, tf::Transform& transform)
 void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg, 
                                     const sensor_msgs::CameraInfoConstPtr& camerainfo)
 {
+	ROS_INFO("New image frame is arrived");
     // updating the camera model is cheap if not modified
     cameramodel.fromCameraInfo(camerainfo);
     // publishing uncalibrated images? -> return (according to CameraInfo message documentation,
@@ -101,7 +106,7 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
         ********************************************************************/
 
     auto foundObjects = chilitags3d.estimate(inputImage);
-    ROS_DEBUG_STREAM(foundObjects.size() << " objects found.");
+    ROS_INFO("%d objects found.", foundObjects.size());
 
     /****************************************************************
     *                Publish TF transforms                          *
@@ -111,10 +116,13 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
     auto previouslySeen(objectsSeen);
 #endif
     objectsSeen.clear();
-
-      for (auto kv = foundObjects.begin(); kv != foundObjects.end(); ++kv) {
+	for (auto kv = foundObjects.begin(); kv != foundObjects.end(); ++kv) {
 //    for (auto& kv : foundObjects) {
-
+    	std::string tmp = kv->first;
+    	Matx44d trans = kv->second;
+    	ROS_INFO("CAM_FRAME:%s", camera_frame.c_str());
+    	ROS_INFO("%s", tmp.c_str());
+    	ROS_INFO("position: %f, %f, %f ", trans(0,3), trans(1,3), trans(2,3));
         objectsSeen.insert(kv->first);
         setROSTransform(kv->second, 
                         transform);

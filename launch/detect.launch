@@ -1,5 +1,4 @@
 <launch>
-
   <!-- Sets the image source. -->
   <arg name="image_topic" default="/nao_camera/image_raw" />
   <remap from="image" to="$(arg image_topic)" />
@@ -32,8 +31,8 @@
   
   <node pkg="ros_markers" type="detect" name="ros_markers">
     <param name="camera_frame_id" type="str" value="$(arg camera_frame_id)" />
-    <param name="markers_configuration" type="str" 
-      value="$(arg markers_configuration)" />
+<!--    <param name="markers_configuration" type="str" value="$(arg markers_configuration)" /> -->
+	<param name="markers_configuration" type="str" value="$(find ros_markers)/config/just_markers.yml" />
     <param name="omit_other_tags" type="bool" value="$(arg omit_other_tags)" />
     <param name="default_marker_size" type="double" value="$(arg default_marker_size)" />
     <param name="gain" type="double" value="$(arg gain)" />
