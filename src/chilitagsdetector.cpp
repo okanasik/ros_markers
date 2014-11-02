@@ -33,7 +33,7 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
         exit(1);
     }
 #endif
-    sub = it.subscribeCamera("image", 1, &ChilitagsDetector::findMarkers, this);
+    sub = it.subscribeCamera("image", 100, &ChilitagsDetector::findMarkers, this);
     chilitags3d.readTagConfiguration(configFilename, omitOtherTags);
 
     if(tagSize!=USE_CHILITAGS_DEFAULT_PARAM)
@@ -54,9 +54,12 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
 
 void ChilitagsDetector::setROSTransform(Matx44d trans, tf::Transform& transform)
 {
-    transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
-                                    trans(1,3) / 1000,
-                                    trans(2,3) / 1000) );
+//    transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
+//                                    trans(1,3) / 1000,
+//                                    trans(2,3) / 1000) );
+    transform.setOrigin( tf::Vector3( trans(2,3) / 1000,
+                                    -1 * trans(0,3) / 1000,
+                                    -1 * trans(1,3) / 1000) );
 
     tf::Quaternion qrot;
     tf::Matrix3x3 mrot(
@@ -109,17 +112,18 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
 #endif
     objectsSeen.clear();
 
-    for (auto& kv : foundObjects) {
+      for (auto kv = foundObjects.begin(); kv != foundObjects.end(); ++kv) {
+//    for (auto& kv : foundObjects) {
 
-        objectsSeen.insert(kv.first);
-        setROSTransform(kv.second, 
+        objectsSeen.insert(kv->first);
+        setROSTransform(kv->second, 
                         transform);
 
         br.sendTransform(
                 tf::StampedTransform(transform, 
                                         ros::Time::now() + ros::Duration(TRANSFORM_FUTURE_DATING), 
                                         camera_frame, 
-                                        kv.first));
+                                        kv->first));
     }
 
 #ifdef WITH_KNOWLEDGE
