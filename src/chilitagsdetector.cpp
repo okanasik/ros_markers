@@ -54,22 +54,22 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
 
 void ChilitagsDetector::setROSTransform(Matx44d trans, tf::Transform& transform)
 {
-//    transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
-//                                    trans(1,3) / 1000,
-//                                    trans(2,3) / 1000) );
-    transform.setOrigin( tf::Vector3( trans(2,3) / 1000,
-                                    -1 * trans(0,3) / 1000,
-                                    -1 * trans(1,3) / 1000) );
+    transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
+                                    trans(1,3) / 1000,
+                                    trans(2,3) / 1000) );
+//    transform.setOrigin( tf::Vector3( trans(2,3) / 1000,
+//                                    -1 * trans(0,3) / 1000,
+//                                    -1 * trans(1,3) / 1000) );
 
     tf::Quaternion qrot;
-//    tf::Matrix3x3 mrot(
-//        trans(0,0), trans(0,1), trans(0,2),
-//        trans(1,0), trans(1,1), trans(1,2),
-//        trans(2,0), trans(2,1), trans(2,2));
-        tf::Matrix3x3 mrot(
-        trans(2,0), trans(2,1), trans(2,2),
-        trans(1,0), trans(1,1), trans(1,0),
-        trans(0,0), trans(0,1), trans(0,0));
+    tf::Matrix3x3 mrot(
+        trans(0,0), trans(0,1), trans(0,2),
+        trans(1,0), trans(1,1), trans(1,2),
+        trans(2,0), trans(2,1), trans(2,2));
+//        tf::Matrix3x3 mrot(
+//        trans(2,0), trans(2,1), trans(2,2),
+//        trans(1,0), trans(1,1), trans(1,0),
+//        trans(0,0), trans(0,1), trans(0,0));
     mrot.getRotation(qrot);
     transform.setRotation(qrot);
 }

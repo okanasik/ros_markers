@@ -18,6 +18,7 @@ find_package(OpenCV REQUIRED)
 find_package(PkgConfig)
 set( ENV{PKG_CONFIG_PATH} "/usr/local/lib/pkgconfig")
 pkg_search_module(CHILITAGS REQUIRED chilitags)
+set(CMAKE_CXX_FLAGS "-DBOOST_NO_DEFAULTED_FUNCTIONS")
 
 ###################################
 ## catkin specific configuration ##
